@@ -1,0 +1,28 @@
+.game-board {
+    align-items: center;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+
+    .column-num {
+        align-items: center;
+        display: flex;
+        flex-flow: row nowrap;
+        justify-content: space-between;
+        gap: 0px;
+
+        div {
+            align-items: center;
+            display: flex;
+            justify-content: center;
+            height: 20px;
+            width: 60px;
+
+            &:first-of-type {
+                margin-left: auto;
+            }
+        }
+    }
+}

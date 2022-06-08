@@ -1,0 +1,35 @@
+.row {
+    align-items: center;
+    display: flex;
+    flex-flow: row nowrap;
+
+    &:nth-of-type(odd) {
+        .square {
+            &:nth-of-type(odd) {
+                background-color: #fff;
+            }
+            &:nth-of-type(even) {
+                background-color: #77A26D;
+            }
+        }
+    }
+    &:nth-of-type(even) {
+        .square {
+            &:nth-of-type(odd) {
+                background-color: #77A26D;
+            }
+            &:nth-of-type(even) {
+                background-color: #fff;
+            }
+        }
+    }
+    &:last-of-type {
+        .square {
+            border-bottom: 2px solid black;
+        }
+    }
+    .row-num {
+        height: 100%;
+        width: 20px;
+    }
+}
