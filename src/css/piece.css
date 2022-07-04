@@ -3,6 +3,13 @@
   height: 40px;
   width: 40px; }
   .piece.red {
-    background-color: red; }
+    background-color: maroon; }
   .piece.black {
     background-color: black; }
+  .piece.king {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='icon icon-tabler icon-tabler-crown' width='24' height='24' viewBox='0 0 24 24' stroke-width='1.25' stroke='%23ffffff' fill='none' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke='none' d='M0 0h24v24H0z' fill='none'%3E%3C/path%3E%3Cpath d='M12 6l4 6l5 -4l-2 10h-14l-2 -10l5 4z'%3E%3C/path%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 80%; }
+  .clicked .piece {
+    border: 2px solid white; }

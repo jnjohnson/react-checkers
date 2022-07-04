@@ -5,6 +5,8 @@
   justify-content: center;
   height: 100vh;
   width: 100%; }
+  .game-board .status {
+    margin: 0px 0px 20px 22px; }
   .game-board .column-num {
     align-items: center;
     display: flex;

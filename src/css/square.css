@@ -10,3 +10,5 @@
   width: 60px; }
   .square:last-of-type {
     border-right: 2px solid black; }
+  .square.safe {
+    background-color: palegoldenrod !important; }

@@ -12,4 +12,7 @@
     &:last-of-type {
         border-right: 2px solid black;
     }
+    &.safe {
+        background-color: palegoldenrod !important;
+    }
 }
