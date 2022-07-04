@@ -12,7 +12,11 @@
     &:last-of-type {
         border-right: 2px solid black;
     }
+    &.has-piece {
+        cursor: pointer;
+    }
     &.safe {
         background-color: palegoldenrod !important;
+        cursor: pointer;
     }
 }

@@ -52,8 +52,11 @@
   width: 60px; }
   .square:last-of-type {
     border-right: 2px solid black; }
+  .square.has-piece {
+    cursor: pointer; }
   .square.safe {
-    background-color: palegoldenrod !important; }
+    background-color: palegoldenrod !important;
+    cursor: pointer; }
 
 .piece {
   border-radius: 100%;
