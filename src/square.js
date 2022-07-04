@@ -15,7 +15,7 @@ class Square extends React.Component {
     }
     
     render() {
-        var classes = 'square ' + (this.props.data.clicked ? 'clicked ' : '') + (this.props.data.canMoveTo ? 'safe' : '');
+        var classes = 'square ' + (this.props.data.clicked ? 'clicked ' : '') + (this.props.data.canMoveTo ? 'safe ' : '') + (this.props.data.hasPiece ? 'has-piece' : '');
         return (
             <button className={classes} onClick={this.props.onClick}>
                 {this.renderPiece()}
