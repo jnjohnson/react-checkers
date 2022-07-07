@@ -60,6 +60,21 @@ class Game extends React.Component {
     hasPiece(i, j) {
         return this.state.board[i][j].hasPiece;
     }
+    // Get the color of the piece on the square at i, j
+    getPieceColor(i, j) {
+        return this.state.board[i][j].piece.color;
+    }
+    // - Check to see if the square at i, j has a piece of the right color
+    hasRightColorPiece(i, j) {
+
+        if (this.hasPiece(i, j) && this.state.blackIsNext && this.getPieceColor(i, j) === 'black') {
+            return true;
+        } else if (this.hasPiece(i, j) && !this.state.blackIsNext && this.getPieceColor(i, j) === 'red') {
+            return true;
+        } else {
+            return false;
+        }
+    }
     // - Check to see if the square at i, j can be moved to
     canMoveTo(i, j) {
         return this.state.board[i][j].canMoveTo;
@@ -161,7 +176,7 @@ class Game extends React.Component {
     // Resets the data.clicked and data.canMoveTo flags for each square
     // If the square has a piece on it, highlight the piece and it's available moves
     handleClick(i, j) {
-        if (this.hasPiece(i, j)) {
+        if (this.hasRightColorPiece(i, j)) {
             this.resetBoard();
             this.checkMoves(i, j);
             const square = this.getSquareCopy(i, j);
@@ -170,6 +185,7 @@ class Game extends React.Component {
         } else if (this.canMoveTo(i, j)) {
             this.movePieceTo(i, j);
             this.resetBoard();
+            this.setState({blackIsNext: !this.state.blackIsNext});
         } else {
             this.resetBoard();
         }
