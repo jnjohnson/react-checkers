@@ -88,27 +88,29 @@ class Game extends React.Component {
         }
     }
     // - Returns a list of valid moves
-    getValidMoves(i, j) {
-        var moves = [];
-        const square = this.getSquare(i, j);
-        if (square.piece.isKing) {
-            // TODO: Handle king logic
-        } else if (square.piece.color === 'red') {
-            if (this.checkIfInBounds(i + 1, j + 1) && !this.hasPiece(i + 1, j + 1)) {
-                moves.push({i: i+1, j: j+1});
-            }
-            if (this.checkIfInBounds(i + 1, j - 1) && !this.hasPiece(i + 1, j - 1)) {
-                moves.push({i: i+1, j: j-1});
-            }
-        } else {
-            if (this.checkIfInBounds(i - 1, j + 1) && !this.hasPiece(i - 1, j + 1)) {
-                moves.push({i: i-1, j: j+1});
-            }
-            if (this.checkIfInBounds(i - 1, j - 1) && !this.hasPiece(i - 1, j - 1)) {
-                moves.push({i: i-1, j: j-1});
+    getValidMoves(i, j, prevSquare = null) {
+        var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
+        var validMoves = [];
+        const square = (prevSquare ? prevSquare : this.getSquare(i, j));
+
+        if (!square.piece.isKing) {
+            if (square.piece.color === 'red') {
+                moves.splice(2, 2);
+            } else {
+                moves.splice(0, 2);
             }
         }
-        return moves;
+        moves.forEach(move => {
+            if (this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
+                validMoves.push(move);
+            } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
+                if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
+                    validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir});
+                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square));
+                }
+            }
+        });
+        return validMoves;
     }
     // - Sets data.clicked and data.canMoveTo to false for every square on the board
     resetBoard() {
