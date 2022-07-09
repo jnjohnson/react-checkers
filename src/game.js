@@ -87,31 +87,7 @@ class Game extends React.Component {
             return false;
         }
     }
-    // - Returns a list of valid moves
-    getValidMoves(i, j, prevSquare = null) {
-        var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
-        var validMoves = [];
-        const square = (prevSquare ? prevSquare : this.getSquare(i, j));
-
-        if (!square.piece.isKing) {
-            if (square.piece.color === 'red') {
-                moves.splice(2, 2);
-            } else {
-                moves.splice(0, 2);
-            }
-        }
-        moves.forEach(move => {
-            if (this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
-                validMoves.push(move);
-            } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
-                if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
-                    validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir});
-                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square));
-                }
-            }
-        });
-        return validMoves;
-    }
+    
     // - Sets data.clicked and data.canMoveTo to false for every square on the board
     resetBoard() {
         const board = this.getBoardCopy();
@@ -119,10 +95,11 @@ class Game extends React.Component {
             for (var j=0; j<this.props.columns; j++) {
                 board[i][j].clicked = false;
                 board[i][j].canMoveTo = false;
+                board[i][j].jumps = [];
             }
         }
-        this.setBoard(board);
         this.setState({
+            board: board,
             currentPiece: null
         });
     }
@@ -132,6 +109,7 @@ class Game extends React.Component {
             clicked: false,
             canMoveTo: false,
             hasPiece: false,
+            jumps: [],
             piece: {
                 color: '',
                 isKing: false,
@@ -170,7 +148,11 @@ class Game extends React.Component {
     movePieceTo(i, j) {
         const piece = this.getCurrentPiece();
         const board = this.getBoardCopy();
+        const jumps = board[i][j].jumps;
         board[piece.i][piece.j] = this.resetSquare(piece.i, piece.j);
+        jumps.forEach(jump => {
+            board[jump.i][jump.j] = this.resetSquare(jump.i, jump.j);
+        });
         board[i][j] = piece.square;
         this.setBoard(board);
     }
@@ -199,8 +181,38 @@ class Game extends React.Component {
         const board = this.getBoardCopy();
         moves.forEach(move => {
             board[move.i][move.j].canMoveTo = true;
+
+            if (move.jump) {
+                board[move.i][move.j].jumps.push(move.jump);
+            }
         });
         this.setBoard(board);
+    }
+
+    // - Returns a list of valid moves
+    getValidMoves(i, j, prevSquare = null) {
+        var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
+        var validMoves = [];
+        const square = (prevSquare ? prevSquare : this.getSquare(i, j));
+
+        if (!square.piece.isKing) {
+            if (square.piece.color === 'red') {
+                moves.splice(2, 2);
+            } else {
+                moves.splice(0, 2);
+            }
+        }
+        moves.forEach(move => {
+            if (this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
+                validMoves.push(move);
+            } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
+                if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
+                    validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir, jump: {i: move.i, j: move.j}});
+                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square));
+                }
+            }
+        });
+        return validMoves;
     }
 
     render() {
