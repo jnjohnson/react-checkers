@@ -171,6 +171,9 @@ class Game extends React.Component {
             board[jump.i][jump.j] = this.resetSquare(jump.i, jump.j);
         });
         board[i][j] = piece.square;
+        if ((i === 0 && piece.square.piece.color === 'black') || (i === this.props.rows - 1 && piece.square.piece.color === 'red')) {
+            board[i][j].piece.isKing = true;
+        }
         this.setBoard(board);
     }
     // Handles what happens when a square is clicked
@@ -211,6 +214,7 @@ class Game extends React.Component {
     }
 
     // - Returns a list of valid moves
+    // TODO: Fix recursion error when trying to double jump with king pieces
     getValidMoves(i, j, prevSquare = null, isJump = false) {
         var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
         var validMoves = [];
