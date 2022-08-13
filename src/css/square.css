@@ -7,6 +7,7 @@
   display: flex;
   justify-content: center;
   height: 60px;
+  position: relative;
   width: 60px; }
   .square:last-of-type {
     border-right: 2px solid black; }
@@ -15,3 +16,27 @@
   .square.safe {
     background-color: palegoldenrod !important;
     cursor: pointer; }
+  .square.arrow::before {
+    background-image: url("data:image/svg+xml,%3Csvg width='24' height='24' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd' fill='%23db191c' clip-rule='evenodd'%3E%3Cpath d='M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z'/%3E%3C/svg%3E");
+    background-size: cover;
+    background-position: center;
+    content: '';
+    height: 140%;
+    position: absolute;
+    width: 140%; }
+  .square.arrow.down-right::before {
+    left: 52%;
+    top: 48%;
+    transform: translate(-50%, -50%) rotate(-45deg); }
+  .square.arrow.down-left::before {
+    left: 52%;
+    top: 52%;
+    transform: translate(-50%, -50%) rotate(45deg); }
+  .square.arrow.up-right::before {
+    left: 48%;
+    top: 48%;
+    transform: translate(-50%, -50%) rotate(-135deg); }
+  .square.arrow.up-left::before {
+    left: 46%;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(135deg); }

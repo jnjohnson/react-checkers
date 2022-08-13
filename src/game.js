@@ -33,6 +33,21 @@ class Game extends React.Component {
     getCurrentPiece() {
         return this.state.currentPiece;
     }
+    // - Determine the direction that the piece will be moving (for setting direction of arrow to show movement)
+    getJumpDirection(move) {
+        const iVector = move.jump.i - move.i;
+        const jVector = move.jump.j - move.j;
+
+        if (iVector < 0 && jVector < 0) {
+            return 'arrow down-right';
+        } else if (iVector < 0 && jVector > 0) {
+            return 'arrow down-left';
+        } else if (iVector > 0 && move.j - jVector < 0) {
+            return 'arrow up-right';
+        } else if (iVector > 0 && jVector > 0) {
+            return 'arrow up-left';
+        }
+    }
     // - Sets the state of board
     setBoard(board) {
         this.setState({
@@ -96,6 +111,7 @@ class Game extends React.Component {
                 board[i][j].clicked = false;
                 board[i][j].canMoveTo = false;
                 board[i][j].jumps = [];
+                board[i][j].jumpDirection = null;
             }
         }
         this.setState({
@@ -106,6 +122,7 @@ class Game extends React.Component {
     // Returns the initial state of a square
     resetSquare() {
         return {
+            jumpDirection: null,
             clicked: false,
             canMoveTo: false,
             hasPiece: false,
@@ -184,13 +201,14 @@ class Game extends React.Component {
 
             if (move.jump) {
                 board[move.i][move.j].jumps.push(move.jump);
+                board[move.jump.i][move.jump.j].jumpDirection = this.getJumpDirection(move);
             }
         });
         this.setBoard(board);
     }
 
     // - Returns a list of valid moves
-    getValidMoves(i, j, prevSquare = null) {
+    getValidMoves(i, j, prevSquare = null, isJump = false) {
         var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
         var validMoves = [];
         const square = (prevSquare ? prevSquare : this.getSquare(i, j));
@@ -203,12 +221,12 @@ class Game extends React.Component {
             }
         }
         moves.forEach(move => {
-            if (this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
+            if (!isJump && this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
                 validMoves.push(move);
             } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
                 if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
                     validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir, jump: {i: move.i, j: move.j}});
-                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square));
+                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square, true));
                 }
             }
         });

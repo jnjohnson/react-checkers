@@ -2,7 +2,6 @@ import React from 'react';
 import Piece from './piece.js';
 
 class Square extends React.Component {
-    // TODO: check to see if square has piece. Currently all squares have pieces
     renderPiece() {
         if (this.props.data.hasPiece) {
             return <Piece 
@@ -15,7 +14,11 @@ class Square extends React.Component {
     }
     
     render() {
-        var classes = 'square ' + (this.props.data.clicked ? 'clicked ' : '') + (this.props.data.canMoveTo ? 'safe ' : '') + (this.props.data.hasPiece ? 'has-piece' : '');
+        var classes = 'square ' + 
+        (this.props.data.clicked ? 'clicked ' : '') + 
+        (this.props.data.canMoveTo ? 'safe ' : '') + 
+        (this.props.data.hasPiece ? 'has-piece ' : '') +
+        (this.props.data.jumpDirection ? this.props.data.jumpDirection : '');
         return (
             <button className={classes} onClick={this.props.onClick}>
                 {this.renderPiece()}
