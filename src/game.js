@@ -200,6 +200,9 @@ class Game extends React.Component {
             board[move.i][move.j].canMoveTo = true;
 
             if (move.jump) {
+                if (move.jump.prev && board[move.jump.prev.i][move.jump.prev.j].jumps.length !== 0) {
+                    board[move.i][move.j].jumps.push(...board[move.jump.prev.i][move.jump.prev.j].jumps);
+                }
                 board[move.i][move.j].jumps.push(move.jump);
                 board[move.jump.i][move.jump.j].jumpDirection = this.getJumpDirection(move);
             }
@@ -225,7 +228,7 @@ class Game extends React.Component {
                 validMoves.push(move);
             } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
                 if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
-                    validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir, jump: {i: move.i, j: move.j}});
+                    validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir, jump: {i: move.i, j: move.j, prev: {i: i, j: j}}});
                     validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square, true));
                 }
             }
