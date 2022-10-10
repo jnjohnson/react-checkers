@@ -94,7 +94,7 @@ class Game extends React.Component {
         } else {
             return false;
         }
-    }
+    } 
     // - Check to see if the square at i, j can be moved to
     canMoveTo(i, j) {
         return this.state.board[i][j].canMoveTo;
