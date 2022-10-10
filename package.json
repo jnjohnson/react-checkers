@@ -17,7 +17,9 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "scss": "node-sass --watch src/sass -o src/css"
+    "scss": "node-sass --watch src/sass -o src/css",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -38,6 +40,8 @@
     ]
   },
   "devDependencies": {
+    "gh-pages": "^4.0.0",
     "sass": "^1.52.2"
-  }
+  },
+  "homepage": "https://jnjohnson.github.io/react-checkers"
 }

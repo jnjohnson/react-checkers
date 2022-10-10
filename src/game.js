@@ -7,8 +7,13 @@ class Game extends React.Component {
 
         this.state = {
             blackIsNext: true,
+            blkCount: 12,
             board: this.initBoard(),
             currentPiece: null,
+            moves: [0][0],
+            redCount: 12,
+            gameOver: false,
+            winner: null
         }
     }
 
@@ -37,14 +42,13 @@ class Game extends React.Component {
     getJumpDirection(move) {
         const iVector = move.jump.i - move.i;
         const jVector = move.jump.j - move.j;
-
-        if (iVector < 0 && jVector < 0) {
+        if (iVector === -1 && jVector === -1) {
             return 'arrow down-right';
-        } else if (iVector < 0 && jVector > 0) {
+        } else if (iVector === -1 && jVector === 1) {
             return 'arrow down-left';
-        } else if (iVector > 0 && move.j - jVector < 0) {
+        } else if (iVector === 1 && jVector === -1) {
             return 'arrow up-right';
-        } else if (iVector > 0 && jVector > 0) {
+        } else if (iVector === 1 && jVector === 1) {
             return 'arrow up-left';
         }
     }
@@ -65,6 +69,7 @@ class Game extends React.Component {
     setCurrentPiece(i,j, square) {
         this.setState({
             currentPiece: {
+                color: square.piece.color,
                 i: i,
                 j: j,
                 square: square,
@@ -102,7 +107,41 @@ class Game extends React.Component {
             return false;
         }
     }
-    
+    // - Checks to see if either side has won the game
+    checkForWinner() {
+        const side1 = this.state.blackIsNext ? 'black' : 'red';
+        const side2 = this.state.blackIsNext ? 'red' : 'black';
+        const side1HasValidMoves = this.checkForAnyValidMoves(side1);
+        const side2HasValidMoves = this.checkForAnyValidMoves(side2);
+        if (!side1HasValidMoves && side2HasValidMoves) {
+            const loser = this.state.blackIsNext ? 'Black' : 'Red';
+            const winner = this.state.blackIsNext ? 'Red' : 'Black'; 
+            return 'Game Over. ' + loser + ' has no valid moves left. ' + winner + ' wins!';
+        } else if (!side1HasValidMoves && !side2HasValidMoves) {
+            console.debug('still figuring this out');
+        }
+        if (this.state.redCount === 0) {
+            return 'Game Over. Black Wins!';
+        } else if (this.state.blkCount === 0) {
+            return 'Game Over. Red Wins!';
+        }
+        return false;
+    }
+    // - Check to see if a side has any valid moves left. If not, it is game over
+    checkForAnyValidMoves(color) {
+        var validMoves;
+        for (var i=0; i<this.props.rows; i++) {
+            for (var j=0; j<this.props.columns; j++) {
+                if (this.hasPiece(i, j) && this.getPieceColor(i, j) === color) {
+                    validMoves = this.getValidMoves(i, j);
+                    if (validMoves.length !== 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
     // - Sets data.clicked and data.canMoveTo to false for every square on the board
     resetBoard() {
         const board = this.getBoardCopy();
@@ -120,12 +159,15 @@ class Game extends React.Component {
         });
     }
     // Returns the initial state of a square
-    resetSquare() {
+    resetSquare(i, j) {
         return {
+            i: i,
+            j: j,
             jumpDirection: null,
             clicked: false,
             canMoveTo: false,
             hasPiece: false,
+            hasBeenJumped: false,
             jumps: [],
             piece: {
                 color: '',
@@ -147,7 +189,7 @@ class Game extends React.Component {
     }
     // - Initializes the data for a square on the board 
     initSquare(i, j) {
-        const data = this.resetSquare();
+        const data = this.resetSquare(i, j);
         if ((i%2 === 1 && j%2 === 0) || (i%2 === 0 && j%2 === 1)) {
             if (i < 3) {
                 data.hasPiece = true;
@@ -166,20 +208,33 @@ class Game extends React.Component {
         const piece = this.getCurrentPiece();
         const board = this.getBoardCopy();
         const jumps = board[i][j].jumps;
+        var blkCount = this.state.blkCount;
+        var redCount = this.state.redCount;
         board[piece.i][piece.j] = this.resetSquare(piece.i, piece.j);
         jumps.forEach(jump => {
             board[jump.i][jump.j] = this.resetSquare(jump.i, jump.j);
+            if (piece.color === 'red') {
+                blkCount--;
+            } else if (piece.color === 'black') {
+                redCount--;
+            }
         });
+        piece.square.i = i;
+        piece.square.j = j;
         board[i][j] = piece.square;
         if ((i === 0 && piece.square.piece.color === 'black') || (i === this.props.rows - 1 && piece.square.piece.color === 'red')) {
             board[i][j].piece.isKing = true;
         }
+        this.setState({redCount: redCount, blkCount: blkCount});
         this.setBoard(board);
     }
     // Handles what happens when a square is clicked
     // Resets the data.clicked and data.canMoveTo flags for each square
     // If the square has a piece on it, highlight the piece and it's available moves
     handleClick(i, j) {
+        if (this.checkForWinner()) {
+            return;
+        }
         if (this.hasRightColorPiece(i, j)) {
             this.resetBoard();
             this.checkMoves(i, j);
@@ -214,14 +269,13 @@ class Game extends React.Component {
     }
 
     // - Returns a list of valid moves
-    // TODO: Fix recursion error when trying to double jump with king pieces
-    getValidMoves(i, j, prevSquare = null, isJump = false) {
+    getValidMoves(i, j, prevSquares = [], isJump = false) {
         var moves = [{i: i+1, j: j+1, iDir: 1, jDir: 1}, {i: i+1, j: j-1, iDir: 1, jDir: -1}, {i: i-1, j: j+1, iDir: -1, jDir: 1}, {i: i-1, j: j-1, iDir: -1, jDir: -1}];
         var validMoves = [];
-        const square = (prevSquare ? prevSquare : this.getSquare(i, j));
-
-        if (!square.piece.isKing) {
-            if (square.piece.color === 'red') {
+        const square = this.getSquare(i, j);
+        const piece = (prevSquares.length === 0 ? square.piece : prevSquares[0].piece);
+        if (!piece.isKing) {
+            if (piece.color === 'red') {
                 moves.splice(2, 2);
             } else {
                 moves.splice(0, 2);
@@ -230,10 +284,24 @@ class Game extends React.Component {
         moves.forEach(move => {
             if (!isJump && this.checkIfInBounds(move.i, move.j) && !this.hasPiece(move.i, move.j)) {
                 validMoves.push(move);
-            } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== square.piece.color) {
+            } else if (this.checkIfInBounds(move.i, move.j) && this.hasPiece(move.i, move.j) && this.getPieceColor(move.i, move.j) !== piece.color) {
+                if (prevSquares.length !== 0) {
+                    var isLooping = false;
+                    prevSquares.every(prev => {
+                        if (prev.i === move.i + move.iDir && prev.j === move.j + move.jDir) {
+                            isLooping = true;
+                            return false;
+                        }
+                        return true;
+                    });
+                    if (isLooping) {
+                        return;
+                    }
+                }
                 if (this.checkIfInBounds(move.i + move.iDir, move.j + move.jDir) && !this.hasPiece(move.i + move.iDir, move.j + move.jDir)) {
+                    prevSquares.push(square);
                     validMoves.push({i: move.i + move.iDir, j: move.j + move.jDir, jump: {i: move.i, j: move.j, prev: {i: i, j: j}}});
-                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, square, true));
+                    validMoves.push(...this.getValidMoves(move.i + move.iDir, move.j + move.jDir, prevSquares, true));
                 }
             }
         });
@@ -241,7 +309,13 @@ class Game extends React.Component {
     }
 
     render() {
-        let status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'Red');
+        let status;
+        let winner = this.checkForWinner();
+        if (winner) {
+            status = winner;
+        } else {
+            status = 'Next player: ' + (this.state.blackIsNext ? 'Black' : 'Red');
+        }
 
         return (
             <div className="game">
