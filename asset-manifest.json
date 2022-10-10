@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/react-checkers/static/css/main.3e80463b.css",
+    "main.js": "/react-checkers/static/js/main.3bb4607f.js",
+    "index.html": "/react-checkers/index.html",
+    "main.3e80463b.css.map": "/react-checkers/static/css/main.3e80463b.css.map",
+    "main.3bb4607f.js.map": "/react-checkers/static/js/main.3bb4607f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3e80463b.css",
+    "static/js/main.3bb4607f.js"
+  ]
+}
