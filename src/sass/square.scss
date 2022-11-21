@@ -51,4 +51,9 @@
             transform: translate(-50%, -50%) rotate(135deg);
         }
     }
+    @media screen and (max-width: 800px) {
+        aspect-ratio: 1;
+        height: auto;
+        width: (1/9)*100%;
+    }
 }

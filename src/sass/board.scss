@@ -28,4 +28,13 @@
             }
         }
     }
+    @media screen and (max-width: 800px) {
+
+        & > div {
+            width: 90vw;
+        }
+        .column-num div {
+            width: (1/9)*100%;
+        }
+    }
 }

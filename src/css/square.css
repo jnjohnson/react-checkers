@@ -40,3 +40,8 @@
     left: 46%;
     top: 50%;
     transform: translate(-50%, -50%) rotate(135deg); }
+  @media screen and (max-width: 800px) {
+    .square {
+      aspect-ratio: 1;
+      height: auto;
+      width: 11.11111%; } }

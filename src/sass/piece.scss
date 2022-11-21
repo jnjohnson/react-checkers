@@ -18,4 +18,10 @@
     .clicked & {
         border: 2px solid white;
     }
+
+    @media screen and (max-width: 800px) {
+        aspect-ratio: 1;
+        height: auto;
+        width: 80%;
+    }
 }

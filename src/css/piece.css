@@ -13,3 +13,8 @@
     background-size: 80%; }
   .clicked .piece {
     border: 2px solid white; }
+  @media screen and (max-width: 800px) {
+    .piece {
+      aspect-ratio: 1;
+      height: auto;
+      width: 80%; } }

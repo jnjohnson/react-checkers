@@ -32,4 +32,10 @@
         height: 100%;
         width: 20px;
     }
+    @media screen and (max-width: 800px) {
+        .row-num {
+            text-align: center;
+            width: (1/9)*100%;
+        }
+    }
 }
